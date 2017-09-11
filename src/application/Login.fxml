@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane fx:id="LoginController" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LoginController">
+   <children>
+      <Button id="blogin" fx:id="blogin" layoutX="249.0" layoutY="250.0" mnemonicParsing="false" onAction="#actProc" text="Login" />
+      <TextField id="lusuario" fx:id="lusuario" layoutX="198.0" layoutY="156.0" promptText="Usuario" />
+      <Label id="labMenss" fx:id="laMenss" layoutX="210.0" layoutY="226.0" prefHeight="21.0" prefWidth="181.0" />
+   </children>
+</Pane>

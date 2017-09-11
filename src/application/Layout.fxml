@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="achorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LayoutController">
+   <children>
+      <GridPane layoutX="200.0" layoutY="98.0" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="530.0" minWidth="10.0" prefWidth="497.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="103.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="147.0" minHeight="10.0" prefHeight="147.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <TextArea fx:id="mensagemArea" prefHeight="108.0" prefWidth="497.0" GridPane.rowIndex="1" />
+            <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <Button fx:id="enviarButton" mnemonicParsing="false" onAction="#enviarMensagem" prefHeight="25.0" prefWidth="214.0" text="Enviar" />
+                  <Button fx:id="sairButton" mnemonicParsing="false" onAction="#sairConversa" prefHeight="25.0" prefWidth="238.0" text="Sair" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+            <TextArea fx:id="textoChat" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" styleClass="background" stylesheets="@application.css" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+            <ListView fx:id="listaUsuario" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#abrirNovaConversa" prefHeight="200.0" prefWidth="200.0" stylesheets="@application.css" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

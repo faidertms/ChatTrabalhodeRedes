@@ -1,17 +1,29 @@
 package application;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Mensagem implements Serializable {
     
     private String nome; // talvez so login
     private String texto;
     private String Login;
-    private Set<String> totalOnlines = new HashSet<String>();
+    //private Set<String> totalOnlines = new HashSet<String>();
+    List<String> usuarios = new ArrayList<String>();
+    List<Estado> estados = new ArrayList<Estado>();
+    
     private Tipo tipo;
+    private Estado estado;
 
-    public String getNome() {
+    public Estado getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Estado estado) {
+		this.estado = estado;
+	}
+
+	public String getNome() {
         return nome;
     }
 
@@ -35,13 +47,6 @@ public class Mensagem implements Serializable {
         this.Login = nameReserved;
     }
 
-    public Set<String> getTotalOnlines() {
-        return totalOnlines;
-    }
-
-    public void setTotalOnline(Set<String> setOnlines) {
-        this.totalOnlines = setOnlines;
-    }
 
     public Tipo  getTipo() {
         return tipo;
@@ -51,7 +56,28 @@ public class Mensagem implements Serializable {
         this.tipo = action;
     }
         
-    public enum Tipo {
-    	ABRIRCONEXAO, DESCONECTAR, INDIVIDUAL, TODOS, USUARIOSON
+
+	public List<String> getUsuarios() {
+		return usuarios;
+	}
+
+	public void setUsuarios(List<String> usuarios) {
+		this.usuarios = usuarios;
+	}
+
+	public List<Estado> getEstados() {
+		return estados;
+	}
+
+	public void setEstados(List<Estado> estados) {
+		this.estados = estados;
+	}
+
+	public enum Tipo {
+    	ABRIRCONEXAO, DESCONECTAR, INDIVIDUAL, TODOS, USUARIOSON,ALTERARESTADO,KICK,REMOVIDO
+    }
+    
+    public enum Estado {
+    	AUSENTE, OCUPADO, DISPONIVEL
     }
 }

@@ -9,19 +9,22 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-public class servidorChat implements Runnable {
+import application.Mensagem.Estado;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+public class ServidorChat implements Runnable {
 
 	int porta = 6666;
 	private ServerSocket serverSocket;
-	private InputStream in;
-	private OutputStream out;
-	private Map<String, ObjectOutputStream> onlines = new HashMap<String, ObjectOutputStream>();
-
-	public servidorChat() throws IOException {
+	private Map<String, ObjectOutputStream> online = new HashMap<String, ObjectOutputStream>();
+	private Map<String, Estado> statusOnline = new HashMap<String, Estado>();
+	ObservableList<Usuario> usuarioList ;
+	public ServidorChat(ObservableList<Usuario> usuarioList) throws IOException {
 		super();
+		this.usuarioList = usuarioList;
 		this.serverSocket = new ServerSocket(porta);
 	}
-
 
 
 	@Override
@@ -35,7 +38,7 @@ public class servidorChat implements Runnable {
 			try {
 				System.out.println("Esperando uma ação");
 				socket = serverSocket.accept();
-				acess = new Thread(new clientHandler(socket,onlines));
+				acess = new Thread(new clientHandler(socket,online,statusOnline,this.usuarioList));
 				acess.start();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -45,10 +48,5 @@ public class servidorChat implements Runnable {
 		}
 	}
 	
-	public static void main(String[] args) throws IOException {
-		servidorChat server = new servidorChat();
-		server.run();
-
-	}
 }
 

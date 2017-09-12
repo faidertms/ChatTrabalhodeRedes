@@ -43,8 +43,6 @@ public class LayoutController implements FactoryController{
 	private boolean IndividualMode = false;
 	
 	private ConexaoServidor conexaoHandler;
-	//private ObjectInputStream in;
-	private Socket socket;
 	private String nome;
 	private Mensagem mensagem;
 	
@@ -105,7 +103,7 @@ public class LayoutController implements FactoryController{
 	
 	public void setConexao(ConexaoServidor conexaoHandler,String nome) throws IOException{
 		this.conexaoHandler = conexaoHandler;
-		this.socket = conexaoHandler.getSocket();
+		conexaoHandler.getSocket();
 		this.nome = nome;
 			//Thread thread = new Thread(new ChatHandler(listaUsuario, mensagemArea, usuariosOnline, conexaoHandler));
 		//thread.start();

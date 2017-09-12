@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javafx.concurrent.Task;
 import application.Mensagem.Tipo;
@@ -21,6 +24,7 @@ public class ChatHandler extends Task<ObservableList<String>>{
 	private ObservableList<String> usuariosOnline = FXCollections.observableArrayList();
 	private ConexaoServidor conexaoHandler;
 	private ControllerFactory control;
+	Set<String> usuarios;
 	
 	ObjectInputStream input;
 	public ObservableList<String> call() throws Exception {
@@ -40,13 +44,20 @@ public class ChatHandler extends Task<ObservableList<String>>{
 								e.printStackTrace();
 							}
                         } else if (tipo.equals(Tipo.USUARIOSON)) {
+                        	
                         	usuariosOnline.clear();
-                        	usuariosOnline.addAll(mensagem.getTotalOnlines()); // mudar pra outra
+                        	usuariosOnline.addAll(mensagem.getUsuarios()); // mudar pra outra
                         	listaUsuario.setItems(usuariosOnline);
                         	listaUsuario.refresh();
                             //refreshOnlines(mensagem);
                         }else if (tipo.equals(Tipo.TODOS)){
                         	textoChat.appendText(mensagem.getNome() + " diz: " + mensagem.getTexto() + "\n");
+                        }else if (tipo.equals(Tipo.REMOVIDO)){
+                        	try {
+								removido();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+							}
                         }
                     }
                 });
@@ -63,6 +74,13 @@ public class ChatHandler extends Task<ObservableList<String>>{
 		input = conexaoHandler.getInput();
 		this.control = control;
 		
+	}
+	
+	public void removido() throws UnknownHostException, IOException{
+	  control.removerTodos();
+      this.control.loadScreen("login", "Login.fxml");
+      this.control.setScreen("login");
+      control.erro("Você foi removido do Servidor");
 	}
 	
 	public void individual() throws UnknownHostException, IOException{

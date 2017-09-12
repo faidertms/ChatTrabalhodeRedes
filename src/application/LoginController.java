@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
+import application.Mensagem.Estado;
 import application.Mensagem.Tipo;
 import javafx.event.ActionEvent;
 
@@ -53,6 +54,7 @@ public class LoginController  implements FactoryController{
 		mensagem = new Mensagem();
 		mensagem.setNome(lusuario.getText());
 		mensagem.setTipo(Tipo.ABRIRCONEXAO);
+		mensagem.setEstado(Estado.DISPONIVEL);
 		//enviar
         conexaoHandler = new ConexaoServidor();
         socket = conexaoHandler.conexao();

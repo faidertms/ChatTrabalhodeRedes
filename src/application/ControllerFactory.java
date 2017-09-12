@@ -63,19 +63,24 @@ private Scene scene; //tela
             return false;
         }
     }
+    
+    public void removerTodos(){
+    	screens.clear(); 
+        control.clear();
+    	
+    }
 
     public boolean setScreen(final String nome) {       
         if (screens.get(nome) != null) {  
             if (scene == null) {    
-            	System.out.println("to aqui");
     			scene = new Scene((Parent) screens.get(nome));
-    			stage.setTitle("SisTMS");
+    			stage.setTitle("Chat Publico");
     			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
     			stage.setScene(scene);
     			stage.show();
     			
             } else {
-            	System.out.println("to aqui2");
+            	System.out.println("Chat Publico");
             	scene = new Scene((Parent) screens.get(nome));
     			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
     			stage.setScene(scene);
@@ -94,7 +99,7 @@ private Scene scene; //tela
         if (screens.get(nome) != null) {  
 	        // Cria o palco dialogStage.
 	        Stage dialogStage = new Stage();
-	        dialogStage.setTitle(nome +" Semaforo");
+	        dialogStage.setTitle("Chat particular com :" + nome);
 	        dialogStage.initModality(Modality.WINDOW_MODAL);
 	        //dialogStage.initOwner(stage);
 	        Scene scene = new Scene((AnchorPane) screens.get(nome));
@@ -128,7 +133,7 @@ private Scene scene; //tela
 	}
 
 	public boolean unloadScreen(String name) {
-        if (screens.remove(name) == null && screens.remove(name) == null) {
+        if (screens.remove(name) == null && this.control.remove(name) == null) {
             System.out.println("Não existe");
             return false;
         } else {

@@ -1,21 +1,13 @@
 package application;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import application.Mensagem.Estado;
 import application.Mensagem.Tipo;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class clientHandler implements Runnable {
@@ -51,9 +43,12 @@ public class clientHandler implements Runnable {
 		            return;
 		        } else if (tipo.equals(Tipo.INDIVIDUAL)) {
 		        	enviarParticular(mensagem);
-		        } else if (tipo.equals(Tipo.TODOS) || tipo.equals(Tipo.ALTERARESTADO)) {
+		        } else if (tipo.equals(Tipo.TODOS)) {
 		        	enviarParaTodos(mensagem);
 				
+		        } else if (tipo.equals(Tipo.ALTERARESTADO)){
+		        	this.usuarioList.get(this.usuarioList.indexOf(new Usuario(mensagem.getNome()))).setStatus(mensagem.getEstado().name());;
+		        	enviarOnline();
 		        }
 			}
 		} catch (IOException | ClassNotFoundException e) {

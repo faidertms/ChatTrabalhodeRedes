@@ -61,8 +61,8 @@ public class Usuario {
 	public StringProperty getStatus() {
 		return status;
 	}
-	public void setStatus(StringProperty status) {
-		this.status = status;
+	public void setStatus(String status) {
+		this.status.set(status);;
 	}
 	public void closeSocket(){
 		Mensagem mensagem = new Mensagem();

@@ -30,6 +30,7 @@ public class ChatHandler extends Task<ObservableList<String>>{
 	public ObservableList<String> call() throws Exception {
         mensagem = null;
             while ((mensagem = (Mensagem) input.readObject()) != null) {
+            	System.out.println("recebi");
                 Tipo tipo = mensagem.getTipo();
                 Platform.runLater(new Runnable() {
                     @Override public void run() {

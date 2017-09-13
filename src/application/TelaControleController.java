@@ -35,8 +35,6 @@ public class TelaControleController implements Initializable {
 	private Thread thread;
 	
 	ObservableList<Usuario> usuarioList = FXCollections.observableArrayList();
-	private Map<String, ObjectOutputStream> online = new HashMap<String, ObjectOutputStream>();
-	private Map<String, Estado> statusOnline = new HashMap<String, Estado>();
 
 	public void initialize(URL location, ResourceBundle resources) {
 		usuarioColuna.setCellValueFactory(cellData ->  cellData.getValue().getNome());
@@ -60,20 +58,11 @@ public class TelaControleController implements Initializable {
 	@FXML
 	public void removerUsuario(ActionEvent event) {
 		Usuario get = usuariosTable.getSelectionModel().getSelectedItem();
-		int select = usuariosTable.getSelectionModel().getSelectedIndex();
 	    if (get!= null) {
-	        online.remove(get.getNome().get());
-	        statusOnline.remove(get.getNome().get());
 	        get.closeSocket();
-	        this.usuarioList.remove(select);
 	        get = null;
 	    }else{
 	    	//erro();
 	    }
-	}
-
-	public void setOnline(Map<String, ObjectOutputStream> online , Map<String, Estado> statusOnline ) {
-		this.online = online;
-		this.statusOnline = statusOnline;
 	}
 }

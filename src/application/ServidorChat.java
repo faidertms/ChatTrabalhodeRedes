@@ -17,8 +17,6 @@ public class ServidorChat implements Runnable {
 
 	int porta = 6666;
 	private ServerSocket serverSocket;
-	private Map<String, ObjectOutputStream> online = new HashMap<String, ObjectOutputStream>();
-	private Map<String, Estado> statusOnline = new HashMap<String, Estado>();
 	ObservableList<Usuario> usuarioList ;
 	public ServidorChat(ObservableList<Usuario> usuarioList) throws IOException {
 		super();
@@ -38,7 +36,7 @@ public class ServidorChat implements Runnable {
 			try {
 				System.out.println("Esperando uma ação");
 				socket = serverSocket.accept();
-				acess = new Thread(new clientHandler(socket,online,statusOnline,this.usuarioList));
+				acess = new Thread(new clientHandler(socket,this.usuarioList));
 				acess.start();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

@@ -19,16 +19,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class clientHandler implements Runnable {
-	public clientHandler(Socket socket, Map<String, ObjectOutputStream> online,Map<String, Estado> statusOnline , ObservableList<Usuario> usuarioList) throws IOException {
+	public clientHandler(Socket socket , ObservableList<Usuario> usuarioList) throws IOException {
 		this.out = new ObjectOutputStream(socket.getOutputStream());
 		this.in = new ObjectInputStream (socket.getInputStream());
 		this.usuarioList = usuarioList;
-		this.online = online;
 		this.socket = socket;
-		this.statusOnline = statusOnline;
 	}
-	private Map<String, ObjectOutputStream> online = new HashMap<String, ObjectOutputStream>();
-	private Map<String, Estado> statusOnline = new HashMap<String, Estado>();
 	private ObjectOutputStream out;
     private ObjectInputStream in;
     private Socket socket;
@@ -41,40 +37,33 @@ public class clientHandler implements Runnable {
 		Mensagem mensagem = null;
 		try {	
 			while ((mensagem = (Mensagem) in.readObject()) != null) { 
-			System.out.println(mensagem.getTipo());
-			System.out.println(mensagem.getNome());
-			Tipo tipo = mensagem.getTipo();
-			if (tipo.equals(Tipo.ABRIRCONEXAO)) {
-                boolean isConnect = conectar(mensagem, out);
-                if (isConnect) {
-                	this.usuarioList.add(new Usuario(mensagem.getNome(),socket,mensagem.getEstado()));
-                    online.put(mensagem.getNome(), out);
-                    statusOnline.put(mensagem.getNome(), mensagem.getEstado());
-                    enviarOnline();
-                }
-            } else if (tipo.equals(Tipo.DESCONECTAR)) {
-                desconectar(mensagem, out);
-                //enviarOnline();
-                return;
-            } else if (tipo.equals(Tipo.INDIVIDUAL)) {
-            	enviarParticular(mensagem);
-            } else if (tipo.equals(Tipo.TODOS)) {
-            	enviarParaTodos(mensagem);
-            }
+				System.out.println(mensagem.getTipo());
+				System.out.println(mensagem.getNome());
+				Tipo tipo = mensagem.getTipo();
+				if (tipo.equals(Tipo.ABRIRCONEXAO)) {
+		            boolean isConnect = conectar(mensagem, out);
+		            if (isConnect) {
+		            	this.usuarioList.add(new Usuario(mensagem.getNome(),socket,mensagem.getEstado(),out));
+		                enviarOnline();
+		            }
+		        } else if (tipo.equals(Tipo.DESCONECTAR)) {
+		            desconectar(mensagem, out);
+		            return;
+		        } else if (tipo.equals(Tipo.INDIVIDUAL)) {
+		        	enviarParticular(mensagem);
+		        } else if (tipo.equals(Tipo.TODOS) || tipo.equals(Tipo.ALTERARESTADO)) {
+		        	enviarParaTodos(mensagem);
 				
+		        }
 			}
-			} catch (IOException | ClassNotFoundException e) {
-				this.timeOutOuRemovido(mensagem, out);
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			}
-	
+		} catch (IOException | ClassNotFoundException e) {
+			this.desconectar(mensagem, out);
+		}
 	}
 	    private boolean conectar(Mensagem mensagem, ObjectOutputStream out) {
-	        if (online.size() == 0 || !(online.containsKey(mensagem.getNome()))) {
+	        if (usuarioList.isEmpty() || !(usuarioList.equals(new Usuario(mensagem.getNome())))) {
 	        	mensagem.setTexto("");
 	            mensagem.setTexto("ACEITA");
-	            
 	            enviarMensagem(mensagem, out);
 	            return true;
 	        }else{ 
@@ -86,22 +75,9 @@ public class clientHandler implements Runnable {
 	    
 	    }
 	    
-	    private void timeOutOuRemovido(Mensagem mensagem, ObjectOutputStream out) {
-	        mensagem.setTexto("até logo!");
-	        mensagem.setTipo(Tipo.TODOS);// ou todos
-	        enviarParaTodos(mensagem);
-	        mensagem.setTipo(Tipo.REMOVIDO);
-	        enviarParticular(mensagem);
-	        System.out.println("User " + mensagem.getNome() + " saiu da sala");
-	        //online.remove(mensagem.getNome());
-	        this.statusOnline.remove(mensagem.getNome());
-	        this.usuarioList.remove(new Usuario(mensagem.getNome()));
-	        enviarOnline();
-	    }
-	    
 	    private void desconectar(Mensagem mensagem, ObjectOutputStream out) {
-	        online.remove(mensagem.getNome());
-	        this.statusOnline.remove(mensagem.getNome());
+	        //online.remove(mensagem.getNome());
+	        //this.statusOnline.remove(mensagem.getNome());
 	        this.usuarioList.remove(new Usuario(mensagem.getNome()));
 	        mensagem.setTexto("até logo!");
 	        mensagem.setTipo(Tipo.TODOS);// ou todos
@@ -120,11 +96,11 @@ public class clientHandler implements Runnable {
         }
 
         private void enviarParticular(Mensagem mensagem) {
-            for (Map.Entry<String, ObjectOutputStream> kv : online.entrySet()) {
-                if (kv.getKey().equals(mensagem.getNameReserved())) {
+            for (Usuario kv: usuarioList) {
+                if (kv.equals(new Usuario(mensagem.getNameReserved()))) {
                     try {
-                        kv.getValue().writeObject(mensagem);
-                        kv.getValue().flush();
+                        kv.getOut().writeObject(mensagem);
+                        kv.getOut().flush();
                     } catch (IOException e) {
                     	e.printStackTrace();
                     }
@@ -133,12 +109,12 @@ public class clientHandler implements Runnable {
         }
 
         private void enviarParaTodos(Mensagem mensagem) {
-            for (Map.Entry<String, ObjectOutputStream> kv : online.entrySet()) {
-                if (!kv.getKey().equals(mensagem.getNome())) {
+            for (Usuario kv: usuarioList) {
+                if (!kv.equals(new Usuario(mensagem.getNome()))) {
                     mensagem.setTipo(Tipo.TODOS);
                     try {
-                        kv.getValue().writeObject(mensagem);
-                        kv.getValue().flush();
+                    	   kv.getOut().writeObject(mensagem);
+                           kv.getOut().flush();
                     } catch (IOException e) {
                     	e.printStackTrace();
                     }
@@ -149,9 +125,9 @@ public class clientHandler implements Runnable {
         private void enviarOnline() {
             List<String> usuarios = new ArrayList<String>();
             List<Estado> estados = new ArrayList<Estado>();
-            for (Map.Entry<String, Estado> kv : statusOnline.entrySet()) {
-            	usuarios.add(kv.getKey());
-            	estados.add(kv.getValue());
+            for (Usuario kv: usuarioList) {
+            	usuarios.add(kv.getNome().get());
+            	estados.add(Estado.valueOf(kv.getStatus().get()));
             }
             //AVALIAR
             Mensagem mensagem = new Mensagem();
@@ -159,11 +135,11 @@ public class clientHandler implements Runnable {
             mensagem.setEstados(estados);
             mensagem.setUsuarios(usuarios);
 
-            for (Map.Entry<String, ObjectOutputStream> kv : online.entrySet()) {
-            	mensagem.setNome(kv.getKey());
+            for (Usuario kv: usuarioList) {
+            	mensagem.setNome(kv.getNome().get());
                 try {
-                    kv.getValue().writeObject(mensagem);
-                    kv.getValue().flush();
+                    kv.getOut().writeObject(mensagem);
+                    kv.getOut().flush();
                 } catch (IOException e) {
                 	e.printStackTrace();
                 	}

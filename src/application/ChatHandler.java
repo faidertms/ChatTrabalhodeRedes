@@ -2,19 +2,18 @@ package application;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
-
+import application.Mensagem.Estado;
 import javafx.concurrent.Task;
 import application.Mensagem.Tipo;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.util.Callback;
 
 public class ChatHandler extends Task<ObservableList<String>>{
 	@SuppressWarnings("unchecked")
@@ -22,6 +21,7 @@ public class ChatHandler extends Task<ObservableList<String>>{
 	private ListView<String> listaUsuario;
 	private TextArea textoChat;
 	private ObservableList<String> usuariosOnline = FXCollections.observableArrayList();
+	private ObservableList<Estado> estados = FXCollections.observableArrayList();
 	private ConexaoServidor conexaoHandler;
 	private ControllerFactory control;
 	Set<String> usuarios;
@@ -44,9 +44,10 @@ public class ChatHandler extends Task<ObservableList<String>>{
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-                        } else if (tipo.equals(Tipo.USUARIOSON)) {
-                        	
+                        } else if (tipo.equals(Tipo.USUARIOSON) || tipo.equals(Tipo.ALTERARESTADO)) {
                         	usuariosOnline.clear();
+                        	estados.clear();
+                        	estados.addAll(mensagem.getEstados());
                         	usuariosOnline.addAll(mensagem.getUsuarios()); // mudar pra outra
                         	listaUsuario.setItems(usuariosOnline);
                         	listaUsuario.refresh();
@@ -75,6 +76,49 @@ public class ChatHandler extends Task<ObservableList<String>>{
 		input = conexaoHandler.getInput();
 		this.control = control;
 		
+        this.listaUsuario.setCellFactory(new Callback<ListView<String>, ListCell<String>>(){
+
+            @Override
+            public ListCell<String> call(ListView<String> p) {
+
+                ListCell<String> cell = new ListCell<String>(){
+
+                    @Override
+                    protected void updateItem(String t, boolean bln) {
+                        super.updateItem(t, bln);
+                        if (t != null ) {
+                            setText( t);
+                            Estado estado = estados.get(usuariosOnline.indexOf(t));
+                            	if( estado == Estado.DISPONIVEL){
+                            		this.remover();
+                                    getStyleClass().add("Disponivel");
+                                }else if(estado == Estado.AUSENTE){
+                                	remover();
+                                	getStyleClass().add("Ausente");
+                                } else if(estado == Estado.OCUPADO){
+                                	this.remover();
+                                	getStyleClass().add("Ocupado");
+                                }else{
+                                	this.remover();
+                                }
+                        } else {
+                            setText("");
+                            this.remover();
+                        }
+                    }
+                    
+                    void remover(){
+                    	getStyleClass().remove("Disponivel");
+                    	getStyleClass().remove("Ausente");
+                    	getStyleClass().remove("Ocupado");
+                    }
+
+                };
+
+                return cell;
+            }
+        });
+		
 	}
 	
 	public void removido() throws UnknownHostException, IOException{
@@ -88,13 +132,12 @@ public class ChatHandler extends Task<ObservableList<String>>{
     	System.out.println(mensagem.getNome());
     	
     	if(!control.existScreen(mensagem.getNome())){
-    		System.out.println("erro é aqui será");
-        	control.loadScreenPop(mensagem.getNome(), "Layout.fxml");
-        	((LayoutController) control.getController(mensagem.getNome())).setUsuarioIndividual(conexaoHandler,mensagem.getNome(), mensagem.getNameReserved());
-        	((LayoutController) control.getController(mensagem.getNome())).setText((mensagem.getNome() + " diz: " + mensagem.getTexto() + "\n"));
+        	control.loadScreenPop(mensagem.getNome(), "LayoutIndividual.fxml");
+        	((LayoutIndividualController) control.getController(mensagem.getNome())).setUsuarioIndividual(conexaoHandler,mensagem.getNome(), mensagem.getNameReserved());
+        	((LayoutIndividualController) control.getController(mensagem.getNome())).setText((mensagem.getNome() + " diz: " + mensagem.getTexto() + "\n"));
         	control.setScreenPop(mensagem.getNome());
     	}else{
-    		((LayoutController) control.getController(mensagem.getNome())).setText((mensagem.getNome() + " diz: " + mensagem.getTexto() + "\n"));
+    		((LayoutIndividualController) control.getController(mensagem.getNome())).setText((mensagem.getNome() + " diz: " + mensagem.getTexto() + "\n"));
     	}
 	}
 		

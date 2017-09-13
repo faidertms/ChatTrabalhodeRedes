@@ -22,30 +22,3 @@ public class Main extends Application {
 		}
 	}
 
-	
-	/*public static void main(String[] args) throws IOException {
-		while(true){
-		Socket socket = new Socket("localhost", 6666);
-		
-		if(socket.isConnected()){
-			// um while q atualizar a cada seg
-			// e uma condicional que envia a mensagem.
-			InputStream in = socket.getInputStream();
-			OutputStream out = socket.getOutputStream();
-			
-			String msg = "OIE";
-			
-			out.write(msg.getBytes());
-			out.flush();
-			
-			byte[] buffer = new byte[1024];
-			in.read(buffer);
-			System.out.println(new String(buffer));
-			socket.close();
-		}}
-		
-
-		
-		
-	}
-}//*/

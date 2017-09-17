@@ -35,9 +35,7 @@ public class LoginController  implements FactoryController{
 	
 	private ControllerFactory controller;
 	private ConexaoServidor conexaoHandler;
-	private ObjectInputStream in;
-	private Socket socket;
-	
+
 
 	// Event Listener on Button[#blogin].onAction
 	
@@ -55,20 +53,21 @@ public class LoginController  implements FactoryController{
 		mensagem.setNome(lusuario.getText());
 		mensagem.setTipo(Tipo.ABRIRCONEXAO);
 		mensagem.setEstado(Estado.DISPONIVEL);
+		mensagem.setSala(0);
 		//enviar
         conexaoHandler = new ConexaoServidor();
-        socket = conexaoHandler.conexao();
+        conexaoHandler.conexao();
         conexaoHandler.enviar(mensagem);
        // in = new ObjectInputStream(socket.getInputStream());
         mensagem = conexaoHandler.receber();//(Mensagem) in.readObject();
-		 if (mensagem.getTexto().equals("NO")) {
+		 if (mensagem.getTexto().equals("RECUSADA")) {
 	            lusuario.setText("");
 	            laMenss.setText("Conexão não realizada!\nTente novamente com um novo nome.");
 	      }else{
-	    	  controller.loadScreen("inicial","Layout.fxml");     // posso chamar no login   
-	    	  LayoutController inicial = (LayoutController) controller.getController("inicial");
+	    	  controller.loadScreen("Sala:"+mensagem.getSala(),"Layout.fxml");     // posso chamar no login   
+	    	  LayoutController inicial = (LayoutController) controller.getController("Sala:"+mensagem.getSala());
 	    	  inicial.setConexao(conexaoHandler,mensagem.getNome());
-	    	  controller.setScreen("inicial");
+	    	  controller.setScreen("Sala:"+mensagem.getSala());
 	    	  this.controller.unloadScreen("login");
 	      }
 	}

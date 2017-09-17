@@ -11,10 +11,21 @@ public class Mensagem implements Serializable {
     //private Set<String> totalOnlines = new HashSet<String>();
     List<String> usuarios = new ArrayList<String>();
     List<Estado> estados = new ArrayList<Estado>();
-    
+    List<String> salasDisponiveis = new ArrayList<String>();
+    private int sala;
     private Tipo tipo;
+
+	private boolean motivo; // usado apenas para o maldito desconectar pode ser bool
     private Estado estado;
 
+    public List<String> getSalasDisponiveis() {
+		return salasDisponiveis;
+	}
+
+	public void setSalasDisponiveis(List<String> salasDisponiveis) {
+		this.salasDisponiveis = salasDisponiveis;
+	}
+    
     public Estado getEstado() {
 		return estado;
 	}
@@ -73,8 +84,24 @@ public class Mensagem implements Serializable {
 		this.estados = estados;
 	}
 
-	public enum Tipo {
-    	ABRIRCONEXAO, DESCONECTAR, INDIVIDUAL, TODOS, USUARIOSON,ALTERARESTADO,KICK,REMOVIDO
+	public int getSala() {
+		return sala;
+	}
+
+	public void setSala(int sala) {
+		this.sala = sala;
+	}
+
+	public boolean isMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(boolean motivo) {
+		this.motivo = motivo;
+	}
+
+	public enum Tipo {//kick = admin removido = servidor usar no metodo remover
+    	ABRIRCONEXAO,ATTSALAS,DESCONECTAR ,DESCONECTARTOTAL, INDIVIDUAL, TODOS, USUARIOSON,ALTERARESTADO,KICK,REMOVIDO,CRIARSALA,ENTRARSALA
     }
     
     public enum Estado {

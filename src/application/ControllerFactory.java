@@ -1,6 +1,7 @@
 package application;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 public class ControllerFactory {
 private HashMap<String, Node> screens = new HashMap<>();
 private HashMap<String, Object> control = new HashMap<>();
+private HashMap<String, Object> popStage = new HashMap<>();
 private Stage stage; //Window
 private Scene scene; //tela
     
@@ -51,8 +53,9 @@ private Scene scene; //tela
     
     public boolean loadScreenPop(String name, String resource) {
         try {
+        	System.out.println(name +" POP");
             FXMLLoader myLoader = new FXMLLoader(getClass().getResource(resource));
-            Parent loadScreen = (AnchorPane) myLoader.load();
+            Parent loadScreen = (Parent) myLoader.load();
             control.put(name,myLoader.getController());
             FactoryController controller = ((FactoryController) myLoader.getController());
             controller.setFactoryController(this);
@@ -67,6 +70,12 @@ private Scene scene; //tela
     public void removerTodos(){
     	screens.clear(); 
         control.clear();
+    	for(Map.Entry<String, Object> entry : this.popStage.entrySet()) {
+    	    Stage dialogStage = (Stage)  entry.getValue();
+    	    dialogStage.close();
+    	    // do what you have to do here
+    	    // In your case, an other loop.
+    	}
     	
     }
 
@@ -80,7 +89,7 @@ private Scene scene; //tela
     			stage.show();
     			
             } else {
-            	System.out.println("Chat Publico");
+            	stage.setTitle(nome);
             	scene = new Scene((Parent) screens.get(nome));
     			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
     			stage.setScene(scene);
@@ -95,12 +104,16 @@ private Scene scene; //tela
 
     }
     
-    public boolean setScreenPop(final String nome) {       
+    public boolean setScreenPop(final String nome, boolean tipo) {       
         if (screens.get(nome) != null) {  
 	        // Cria o palco dialogStage.
 	        Stage dialogStage = new Stage();
+	        if(tipo)
 	        dialogStage.setTitle("Chat particular com :" + nome);
+	        else
+	        dialogStage.setTitle(nome);
 	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	        this.popStage.put(nome, dialogStage);
 	        //dialogStage.initOwner(stage);
 	        Scene scene = new Scene((AnchorPane) screens.get(nome));
 	        dialogStage.setScene(scene);
@@ -124,7 +137,15 @@ private Scene scene; //tela
     	
     	return control.get(nome);
     }
-    public Stage getStage() {
+    public HashMap<String, Object> getControl() {
+		return control;
+	}
+
+	public void setControl(HashMap<String, Object> control) {
+		this.control = control;
+	}
+	
+	public Stage getStage() {
 		return stage;
 	}
 
@@ -137,6 +158,15 @@ private Scene scene; //tela
             System.out.println("Não existe");
             return false;
         } else {
+        	for(Map.Entry<String, Object> entry : this.popStage.entrySet()) {
+        	    String key = entry.getKey();
+        	    Stage dialogStage = (Stage)  entry.getValue();
+        	    if(key.equals(name)){
+        	    	dialogStage.close();
+        	    }
+        	    // do what you have to do here
+        	    // In your case, an other loop.
+        	}
             return true;
         }
     }
@@ -155,6 +185,14 @@ private Scene scene; //tela
         dialogoErro.setHeaderText("Erro na Ação.");
         dialogoErro.setContentText(erro);
         dialogoErro.showAndWait();
+	}
+
+	public HashMap<String, Object> getPopStage() {
+		return popStage;
+	}
+
+	public void setPopStage(HashMap<String, Object> popStage) {
+		this.popStage = popStage;
 	}
 }
 

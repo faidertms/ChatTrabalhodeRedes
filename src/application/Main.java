@@ -22,3 +22,4 @@ public class Main extends Application {
 		}
 	}
 
+// check quando for fechar com X , verifica se é a ultima janela se for avisar o servidor !!!

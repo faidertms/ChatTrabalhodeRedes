@@ -11,20 +11,24 @@ import application.Mensagem.Tipo;
 import javafx.collections.ObservableList;
 
 public class clientHandler implements Runnable {
-	public clientHandler(Socket socket , ObservableList<Usuario> usuarioList) throws IOException {
+	public clientHandler(Socket socket , ObservableList<Usuario> usuarioList,List<Sala> listaDeSala) throws IOException {
 		this.out = new ObjectOutputStream(socket.getOutputStream());
 		this.in = new ObjectInputStream (socket.getInputStream());
 		this.usuarioList = usuarioList;
 		this.socket = socket;
+		this.listaDeSala = listaDeSala;
 	}
-	private ObjectOutputStream out;
+	private List<Sala> listaDeSala;
+	private ObservableList<Usuario> usuarioList; // Lista maxima de usuario
+	//talvez um array de salas conectadas pra reduzir a carga pois se tiver 1b vai procuar 1b
+	//private ObjectOutputStream out;
     private ObjectInputStream in;
+    private ObjectOutputStream out;
     private Socket socket;
-    ObservableList<Usuario> usuarioList;
-	
+    private Usuario usuario;
+    boolean isConnect;
 	@Override
 	public void run() {
-
 		// TODO Auto-generated method stub
 		Mensagem mensagem = null;
 		try {	
@@ -32,33 +36,92 @@ public class clientHandler implements Runnable {
 				System.out.println(mensagem.getTipo());
 				System.out.println(mensagem.getNome());
 				Tipo tipo = mensagem.getTipo();
-				if (tipo.equals(Tipo.ABRIRCONEXAO)) {
-		            boolean isConnect = conectar(mensagem, out);
+				if (tipo.equals(Tipo.ABRIRCONEXAO)) { //*********
+					usuario = new Usuario(mensagem.getNome(),socket,Estado.DISPONIVEL,out);
+		            isConnect = conectar(mensagem,usuario.getOut());
 		            if (isConnect) {
-		            	this.usuarioList.add(new Usuario(mensagem.getNome(),socket,mensagem.getEstado(),out));
-		                enviarOnline();
+		            	this.usuarioList.add(usuario);   
+		            	this.listaDeSala.get(0).getUsuarioList().add(usuario);        	
+		            	usuario.getSalaAtivaUsuario().add(this.listaDeSala.get(0));
+		                enviarSalas();
+		                try {
+							Thread.sleep(500); // evitaer bug
+							enviarOnline(this.listaDeSala.get(0).getUsuarioList(),0);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		                
 		            }
-		        } else if (tipo.equals(Tipo.DESCONECTAR)) {
-		            desconectar(mensagem, out);
+		            
+		        } else if (tipo.equals(Tipo.DESCONECTARTOTAL)) { // tratado no controller
+		        	desconectarTotal(mensagem, usuario.getOut());
 		            return;
-		        } else if (tipo.equals(Tipo.INDIVIDUAL)) {
+		        } else if (tipo.equals(Tipo.INDIVIDUAL)) {//***********************
 		        	enviarParticular(mensagem);
-		        } else if (tipo.equals(Tipo.TODOS)) {
-		        	enviarParaTodos(mensagem);
+		        } else if (tipo.equals(Tipo.TODOS)) {//***********************
+		        	enviarParaTodos(mensagem,usuario.getSalaAtivaUsuario().get(usuario.getSalaAtivaUsuario().indexOf(new Sala(mensagem.getSala(),null))).getUsuarioList());
 				
-		        } else if (tipo.equals(Tipo.ALTERARESTADO)){
-		        	this.usuarioList.get(this.usuarioList.indexOf(new Usuario(mensagem.getNome()))).setStatus(mensagem.getEstado().name());;
-		        	enviarOnline();
+		        } else if (tipo.equals(Tipo.ALTERARESTADO)){//************************
+		        	this.usuarioList.get(this.usuarioList.indexOf(usuario)).setStatus(mensagem.getEstado().name());;
+			        for(Sala sala : usuario.getSalaAtivaUsuario()){
+			        	mensagem.setSala(sala.getId());;
+			        	enviarOnline(sala.getUsuarioList(),sala.getId());
+			        }
+		        } else if (tipo.equals(Tipo.ENTRARSALA)){// tratado controler
+		        	Sala temp = listaDeSala.get(mensagem.getSala());
+		        	temp.getUsuarioList().add(usuario);
+		        	usuario.getSalaAtivaUsuario().add(temp);
+		        	enviarOnline(temp.getUsuarioList(),temp.getId());
+		        	
+		        }else if (tipo.equals(Tipo.KICK)){//****************
+		        	for(Sala sala : usuario.getSalaAtivaUsuario()){
+		        		if(sala.getId() == mensagem.getSala()){
+			        		if(sala.getAdministrador().getNome().get().equals(mensagem.getNome())){ // VAI DAR ERRA NA PRIMEIRA
+			        			Usuario usuarioTemp = sala.getUsuarioList().get(sala.getUsuarioList().indexOf(new Usuario(mensagem.getNameReserved())));
+			        			usuarioTemp.getSalaAtivaUsuario().remove(sala);
+			        			sala.getUsuarioList().remove(usuario);
+			        			mensagem.setTipo(Tipo.KICK);
+			        			this.enviarMensagem(mensagem, usuarioTemp.getOut());
+			        			this.enviarOnline(sala.getUsuarioList(),sala.getId());
+			        		}
+		        		}
+		        	}	
+		        }else if (tipo.equals(Tipo.CRIARSALA)){ // tratado controller e /*******
+		        	Sala temp = new Sala(listaDeSala.size(),usuario);
+		        	temp.getUsuarioList().add(usuario);
+		        	listaDeSala.add(temp);
+		        	this.enviarSalas();
+		        	mensagem.setSala(listaDeSala.size()-1);
+		        	mensagem.setTexto("ACEITA");//chechar pela mensagem
+		        	 try {
+							Thread.sleep(1000); // evitaer bug
+							this.enviarMensagem(mensagem, usuario.getOut());
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		        	
+		        	mensagem.setTexto("");
+		        	for(Sala sala : this.listaDeSala){
+		        		System.out.println(sala.id);
+		        	}
+		        	
+		        	
+		        }else if (tipo.equals(Tipo.DESCONECTAR)){
+		        	desconectarSala(mensagem,usuario.getOut());	
 		        }
 			}
 		} catch (IOException | ClassNotFoundException e) {
-			this.desconectar(mensagem, out);
+			if(isConnect)
+			this.desconectarTotal(mensagem,out);
 		}
 	}
 	    private boolean conectar(Mensagem mensagem, ObjectOutputStream out) {
-	        if (usuarioList.isEmpty() || !(usuarioList.equals(new Usuario(mensagem.getNome())))) {
+	        if (usuarioList.isEmpty() || !(usuarioList.contains((usuario)))) { // aqui mexe
 	        	mensagem.setTexto("");
 	            mensagem.setTexto("ACEITA");
+	            mensagem.setTipo(Tipo.ABRIRCONEXAO);
 	            enviarMensagem(mensagem, out);
 	            return true;
 	        }else{ 
@@ -69,15 +132,26 @@ public class clientHandler implements Runnable {
 
 	    
 	    }
-	    
-	    private void desconectar(Mensagem mensagem, ObjectOutputStream out) {
-	        //online.remove(mensagem.getNome());
-	        //this.statusOnline.remove(mensagem.getNome());
-	        this.usuarioList.remove(new Usuario(mensagem.getNome()));
+	    //tratar como um tipo de ENUM
+	    private void desconectarSala(Mensagem mensagem, ObjectOutputStream out) { // aqui mexe procuar em toda lista
+	    	List<Usuario> listaUsuarioMensagem;
 	        mensagem.setTexto("até logo!");
-	        mensagem.setTipo(Tipo.TODOS);// ou todos
-	        enviarParaTodos(mensagem);
-	        enviarOnline();
+	        listaUsuarioMensagem = usuario.getSalaAtivaUsuario().get(usuario.getSalaAtivaUsuario().indexOf(new Sala(mensagem.getSala(),null))).getUsuarioList();
+	        enviarParaTodos(mensagem,listaUsuarioMensagem);
+	        listaUsuarioMensagem.remove(usuario);
+	        enviarOnline(listaUsuarioMensagem,mensagem.getSala());
+	        System.out.println("User " + mensagem.getNome() + " saiu da sala");
+	    }
+	    //remover motivo
+	    private void desconectarTotal(Mensagem mensagem, ObjectOutputStream out) { // aqui mexe procuar em toda lista
+	        this.usuarioList.remove(usuario);
+	        mensagem.setTexto("até logo!");
+	        for(Sala sala : this.usuario.getSalaAtivaUsuario()){
+					     mensagem.setTexto("até logo!");
+	        			 enviarParaTodos(mensagem,sala.getUsuarioList());
+	        			 sala.getUsuarioList().remove(new Usuario(mensagem.getNome()));
+	        		     enviarOnline(sala.getUsuarioList(),sala.id);
+	        }
 	        System.out.println("User " + mensagem.getNome() + " saiu da sala");
 	    }
 	        
@@ -103,7 +177,7 @@ public class clientHandler implements Runnable {
             }
         }
 
-        private void enviarParaTodos(Mensagem mensagem) {
+        private void enviarParaTodos(Mensagem mensagem, List<Usuario> usuarioList) {
             for (Usuario kv: usuarioList) {
                 if (!kv.equals(new Usuario(mensagem.getNome()))) {
                     mensagem.setTipo(Tipo.TODOS);
@@ -117,8 +191,29 @@ public class clientHandler implements Runnable {
             }
         }
         
-        private void enviarOnline() {
-            List<String> usuarios = new ArrayList<String>();
+        private void enviarSalas() {
+        	List<String> salas = new ArrayList<String>();
+        	for(Sala sala : this.listaDeSala){
+        		salas.add("Sala:"+sala.id);
+        	}
+        	Mensagem mensagem = new Mensagem();
+        	mensagem.setTipo(Tipo.ATTSALAS);
+        	mensagem.setSalasDisponiveis(salas);
+        	
+            for (Usuario kv: this.usuarioList) {
+                    try {
+                    	   kv.getOut().writeObject(mensagem);
+                           kv.getOut().flush();
+                       
+                    } catch (IOException e) {
+                    	e.printStackTrace();
+                    }
+              }
+
+        }
+        
+        private void enviarOnline(List<Usuario> usuarioList,int sala) { // vai ter que um for superior que pecorre todas as salas
+            List<String> usuarios = new ArrayList<String>();// a mensagem pra cada sala
             List<Estado> estados = new ArrayList<Estado>();
             for (Usuario kv: usuarioList) {
             	usuarios.add(kv.getNome().get());
@@ -129,7 +224,9 @@ public class clientHandler implements Runnable {
             mensagem.setTipo(Tipo.USUARIOSON);
             mensagem.setEstados(estados);
             mensagem.setUsuarios(usuarios);
-
+            mensagem.setSala(sala);
+            System.out.println(sala);
+            System.out.println(mensagem.getUsuarios().size());
             for (Usuario kv: usuarioList) {
             	mensagem.setNome(kv.getNome().get());
                 try {

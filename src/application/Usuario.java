@@ -3,6 +3,8 @@ package application;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import application.Mensagem.Estado;
 import application.Mensagem.Tipo;
@@ -15,15 +17,18 @@ public class Usuario {
 	private StringProperty status;
 	private ObjectOutputStream out;
 	Socket socket;
+	private List<Sala> salaAtivaUsuario;
 	
 	
-	public Usuario(String nome, Socket socket, Estado estado,ObjectOutputStream out) {
+	public Usuario(String nome, Socket socket, Estado estado,ObjectOutputStream objectOutputStream) {
 		super();
 		this.socket = socket;
 		this.nome = new SimpleStringProperty(nome);
 		this.ip =  new SimpleStringProperty(socket.getInetAddress().getHostAddress());
 		this.status =  new SimpleStringProperty(estado.name());
-		this.out = out;
+		this.out = objectOutputStream;
+		salaAtivaUsuario = new ArrayList<Sala>();
+		//this.out = out;
 	}
 	public ObjectOutputStream getOut() {
 		return out;
@@ -41,7 +46,7 @@ public class Usuario {
 		super();
 		this.nome = new SimpleStringProperty(nome);
 	}
-	
+	@Override
 	public boolean equals(Object arg0) {
 		return nome.get().equals(((Usuario) arg0).getNome().get());
 	}
@@ -77,5 +82,11 @@ public class Usuario {
 			e.printStackTrace();
 		}
 		
+	}
+	public List<Sala> getSalaAtivaUsuario() {
+		return salaAtivaUsuario;
+	}
+	public void setSalaAtivaUsuario(List<Sala> salaAtivaUsuario) {
+		this.salaAtivaUsuario = salaAtivaUsuario;
 	}
 }

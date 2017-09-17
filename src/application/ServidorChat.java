@@ -1,26 +1,22 @@
 package application;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-
-import application.Mensagem.Estado;
-import javafx.collections.FXCollections;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.collections.ObservableList;
 
 public class ServidorChat implements Runnable {
 
 	int porta = 6666;
 	private ServerSocket serverSocket;
-	ObservableList<Usuario> usuarioList ;
+	ObservableList<Usuario> usuarioList ; // usuarios totais 
+	private List<Sala> listaDeSala;
 	public ServidorChat(ObservableList<Usuario> usuarioList) throws IOException {
 		super();
 		this.usuarioList = usuarioList;
+		this.listaDeSala = new ArrayList<Sala>();
 		this.serverSocket = new ServerSocket(porta);
 	}
 
@@ -28,7 +24,8 @@ public class ServidorChat implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-
+		this.listaDeSala.add(new Sala(0,null)); // sala inicial
+		this.listaDeSala.add(new Sala(1,new Usuario("mike"))); // sala inicial
 		Thread acess = null;
 		System.out.println("Começando");
 		while(true){
@@ -36,7 +33,7 @@ public class ServidorChat implements Runnable {
 			try {
 				System.out.println("Esperando uma ação");
 				socket = serverSocket.accept();
-				acess = new Thread(new clientHandler(socket,this.usuarioList));
+				acess = new Thread(new clientHandler(socket,this.usuarioList,this.listaDeSala));
 				acess.start();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

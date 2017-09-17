@@ -5,13 +5,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
-import application.Mensagem.Estado;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -36,6 +32,7 @@ public class TelaControleController implements Initializable {
 	
 	ObservableList<Usuario> usuarioList = FXCollections.observableArrayList();
 
+	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		usuarioColuna.setCellValueFactory(cellData ->  cellData.getValue().getNome());
 	    statusColuna.setCellValueFactory(cellData -> cellData.getValue().getStatus());

@@ -60,6 +60,7 @@ public class clientHandler implements Runnable {
 		        } else if (tipo.equals(Tipo.INDIVIDUAL)) {//***********************
 		        	enviarParticular(mensagem);
 		        } else if (tipo.equals(Tipo.TODOS)) {//***********************
+		        	System.out.println("mensagem"+mensagem.getSala());
 		        	enviarParaTodos(mensagem,usuario.getSalaAtivaUsuario().get(usuario.getSalaAtivaUsuario().indexOf(new Sala(mensagem.getSala(),null))).getUsuarioList());
 				
 		        } else if (tipo.equals(Tipo.ALTERARESTADO)){//************************
@@ -90,13 +91,12 @@ public class clientHandler implements Runnable {
 		        }else if (tipo.equals(Tipo.CRIARSALA)){ // tratado controller e /*******
 		        	Sala temp = new Sala(listaDeSala.size(),usuario);
 		        	temp.getUsuarioList().add(usuario);
+		        	usuario.getSalaAtivaUsuario().add(temp);
 		        	listaDeSala.add(temp);
 		        	this.enviarSalas();
-		        	mensagem.setSala(listaDeSala.size()-1);
-		        	mensagem.setTexto("ACEITA");//chechar pela mensagem
 		        	 try {
 							Thread.sleep(1000); // evitaer bug
-							this.enviarMensagem(mensagem, usuario.getOut());
+						
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -141,6 +141,7 @@ public class clientHandler implements Runnable {
 	        listaUsuarioMensagem.remove(usuario);
 	        enviarOnline(listaUsuarioMensagem,mensagem.getSala());
 	        System.out.println("User " + mensagem.getNome() + " saiu da sala");
+
 	    }
 	    //remover motivo
 	    private void desconectarTotal(Mensagem mensagem, ObjectOutputStream out) { // aqui mexe procuar em toda lista
@@ -153,6 +154,12 @@ public class clientHandler implements Runnable {
 	        		     enviarOnline(sala.getUsuarioList(),sala.id);
 	        }
 	        System.out.println("User " + mensagem.getNome() + " saiu da sala");
+	        try {
+				usuario.getSocket().close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    }
 	        
         private void enviarMensagem(Mensagem mensagem, ObjectOutputStream output) {

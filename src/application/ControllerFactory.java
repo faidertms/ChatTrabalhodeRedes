@@ -20,22 +20,8 @@ public class ControllerFactory {
 	private HashMap<String, Object> popStage = new HashMap<>();
 	private Stage stage; // Window
 	private Scene scene; // tela
+	private String nome;
 
-	public ControllerFactory() {
-		super();
-	}
-
-	public void addController(String nome, Node screen) {
-		screens.put(nome, screen);
-	}
-
-	public Node getScreen(String nome) {
-		return screens.get(nome);
-	}
-
-	public boolean existScreen(String nome) {
-		return screens.containsKey(nome);
-	}
 
 	public boolean loadScreen(String name, String resource) {
 		try {
@@ -55,7 +41,6 @@ public class ControllerFactory {
 
 	public boolean loadScreenPop(String name, String resource) {
 		try {
-			System.out.println(name + " POP");
 			FXMLLoader myLoader = new FXMLLoader(getClass().getResource(resource));
 			Parent loadScreen = (Parent) myLoader.load();
 			control.put(name, myLoader.getController());
@@ -75,8 +60,6 @@ public class ControllerFactory {
 		for (Map.Entry<String, Object> entry : this.popStage.entrySet()) {
 			Stage dialogStage = (Stage) entry.getValue();
 			dialogStage.close();
-			// do what you have to do here
-			// In your case, an other loop.
 		}
 
 	}
@@ -91,12 +74,17 @@ public class ControllerFactory {
 				stage.show();
 
 			} else {
-				stage.setTitle(nome);
+				stage.setTitle("Usuario: " + this.nome + " conectado a "+nome);
 				scene = new Scene((Parent) screens.get(nome));
 				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 				stage.setScene(scene);
 				stage.show();
-				// stage.setMaximized(true);
+				stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				      public void handle(WindowEvent we) {
+				    	  ((LayoutController) control.get(nome)).sairConversa(null);
+				      }
+				  }); 
+
 			}
 			return true;
 		} else {
@@ -110,14 +98,20 @@ public class ControllerFactory {
 		if (screens.get(nome) != null) {
 			// Cria o palco dialogStage.
 			Stage dialogStage = new Stage();
-			if (tipo)
+			if (tipo){
 				dialogStage.setTitle("Chat particular com :" + nome);
-			else
-				dialogStage.setTitle(nome);
+			}else{
+				dialogStage.setTitle("Usuario: " + this.nome + " conectado a "+nome);
+				dialogStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				      public void handle(WindowEvent we) {
+				    	  ((LayoutController) control.get(nome)).sairConversa(null);
+				      }
+				  });
+			}
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			this.popStage.put(nome, dialogStage);
-			// dialogStage.initOwner(stage);
 			Scene scene = new Scene((AnchorPane) screens.get(nome));
+ 
 			dialogStage.setScene(scene);
 			dialogStage.show();
 			return true;
@@ -128,39 +122,10 @@ public class ControllerFactory {
 
 	}
 
-	public Object getController(String nome) {
-
-		return control.get(nome);
-	}
-
-	public HashMap<String, Object> getControl() {
-		return control;
-	}
-
-	public void setControl(HashMap<String, Object> control) {
-		this.control = control;
-	}
-
-	public HashMap<String, Node> getScreens() {
-		return screens;
-	}
-
-	public void setScreens(HashMap<String, Node> screens) {
-		this.screens = screens;
-	}
-
-	public Stage getStage() {
-		return stage;
-	}
-
-	public void setStage(Stage stage) {
-		this.stage = stage;
-	}
 
 	public boolean unloadScreen(String name) {
 		if (screens.size() > 1 && screens.remove(name) != null && this.control.remove(name) != null) {
 			if (name.equals("Sala:0")) {
-				System.out.println("CLOS E MAROTO," + screens.size());
 				stage.close();
 				stage = null;
 			} else {
@@ -210,5 +175,66 @@ public class ControllerFactory {
 
 	public void setPopStage(HashMap<String, Object> popStage) {
 		this.popStage = popStage;
+	}
+	
+	public Object getController(String nome) {
+
+		return control.get(nome);
+	}
+
+	public HashMap<String, Object> getControl() {
+		return control;
+	}
+
+	public void setControl(HashMap<String, Object> control) {
+		this.control = control;
+	}
+
+	public HashMap<String, Node> getScreens() {
+		return screens;
+	}
+
+	public void setScreens(HashMap<String, Node> screens) {
+		this.screens = screens;
+	}
+
+	public Stage getStage() {
+		return stage;
+	}
+
+	public void setStage(Stage stage) {
+		this.stage = stage;
+	}
+	
+	public Scene getScene() {
+		return scene;
+	}
+
+	public void setScene(Scene scene) {
+		this.scene = scene;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public ControllerFactory() {
+		super();
+	}
+
+	public void addController(String nome, Node screen) {
+		screens.put(nome, screen);
+	}
+
+	public Node getScreen(String nome) {
+		return screens.get(nome);
+	}
+
+	public boolean existScreen(String nome) {
+		return screens.containsKey(nome);
 	}
 }

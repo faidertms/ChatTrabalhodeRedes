@@ -9,7 +9,7 @@ public class Main extends Application {
 		public void start(Stage primaryStage) {
 			try {
 				ControllerFactory mainContainer = new ControllerFactory();
-		        mainContainer.loadScreen("login", "Login.fxml");// posso retira dps
+		        mainContainer.loadScreen("login", "Login.fxml");
 		        mainContainer.setStage(primaryStage);
 		        mainContainer.setScreen("login");
 			} catch(Exception e) {
@@ -21,5 +21,3 @@ public class Main extends Application {
 			launch(args);
 		}
 	}
-
-// check quando for fechar com X , verifica se é a ultima janela se for avisar o servidor !!!

@@ -52,7 +52,7 @@ public class LayoutController implements FactoryController, Initializable {
 	@FXML
 	private ListView<String> listaUsuario;
 	@FXML
-	ChoiceBox<String> choiceEstado = new ChoiceBox<String>();
+	private ChoiceBox<String> choiceEstado = new ChoiceBox<String>();
 	private ObservableList<String> usuariosOnline = FXCollections.observableArrayList();
 	private ObservableList<Estado> estados = FXCollections.observableArrayList();
 	private int idSala;
@@ -62,6 +62,7 @@ public class LayoutController implements FactoryController, Initializable {
 	private ConexaoServidor conexaoHandler;
 	private String nome;
 	private Mensagem mensagem = new Mensagem();
+	
 
 	public ListView<String> getListaUsuario() {
 		return listaUsuario;
@@ -131,6 +132,7 @@ public class LayoutController implements FactoryController, Initializable {
 				return cell;
 			}
 		});
+		//Window theStage = source.getScene().getWindow();
 		this.atualizar = false;
 	}
 
@@ -164,7 +166,6 @@ public class LayoutController implements FactoryController, Initializable {
 			this.mensagem.setNome(nome);
 			this.mensagem.setTexto(text);
 			this.mensagem.setTipo(Tipo.TODOS);
-			;
 			this.mensagem.setSala(this.idSala);
 			this.textoChat.appendText("Você disse: " + text + "\n");
 			this.conexaoHandler.enviar(mensagem);
@@ -196,14 +197,7 @@ public class LayoutController implements FactoryController, Initializable {
 		this.mensagem.setSala(idSala);
 		this.controller.unloadScreen("Sala:" + this.idSala);
 		if (this.controller.getScreens().size() == 0) {
-			try {
-				this.conexaoHandler.getSocket().close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			this.controller.loadScreen("login", "Login.fxml");
-			this.controller.setScreen("login");
+			sairTotal(event);
 
 		} else {
 			this.conexaoHandler.enviar(mensagem);
@@ -261,13 +255,19 @@ public class LayoutController implements FactoryController, Initializable {
 	}
 
 	public void setJanelaSala(ConexaoServidor conexaoHandler, String nome, int sala, ObservableList<String> salas) {
+		List<String> listaDeSala = new ArrayList<String>();
+		for(String idSala : salas){ // criar uma nova referencia
+			listaDeSala.add(idSala);
+		}
+		this.atualizar = true;
 		this.conexaoHandler = conexaoHandler;
 		this.nome = nome;
 		this.idSala = sala;
-		System.out.println(sala);
-		this.comboSalas.setItems(salas);
-		this.comboSalas.getSelectionModel().select(idSala);
-		Platform.runLater(() -> this.comboSalas.getSelectionModel().select(idSala + 1));
+		this.comboSalas.getItems().clear();
+		this.comboSalas.getItems().addAll(listaDeSala);
+		//this.atualizar = false;
+		Platform.runLater(() -> {this.comboSalas.getSelectionModel().select(idSala);this.atualizar = false;});
+		
 
 	}
 
@@ -320,6 +320,7 @@ public class LayoutController implements FactoryController, Initializable {
 	public void setUsuariosOnline(ObservableList<String> usuariosOnline) {
 		this.usuariosOnline = usuariosOnline;
 	}
+	
 
 	public void setSalas(List<String> salasDisponiveis) {
 		String temp = this.comboSalas.getValue();

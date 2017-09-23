@@ -29,44 +29,10 @@ public class ChatHandler extends Task<ObservableList<String>>{
             while ((mensagem = (Mensagem) input.readObject()) != null) {
             	System.out.println(mensagem.getTipo());
             	System.out.println("recebi");
-                Tipo tipo = mensagem.getTipo();
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        if (tipo.equals(Tipo.INDIVIDUAL)) {//**************
-                        	try {
-								individual();
-							} catch (UnknownHostException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-                        } else if (tipo.equals(Tipo.USUARIOSON) || tipo.equals(Tipo.ALTERARESTADO)) {//******************
-                        	System.out.println("Sala:"+mensagem.getSala());
-                        	System.out.println(mensagem.getEstados().size());
-                        	((LayoutController)control.getController("Sala:"+mensagem.getSala())).atualizarEstado(mensagem);
-                        	
-                        	
-                            //refreshOnlines(mensagem);
-                        }else if (tipo.equals(Tipo.TODOS)){
-                        		((LayoutController)control.getController("Sala:"+mensagem.getSala())).setText(mensagem.getNome() + " diz: " + mensagem.getTexto() + "\n");
-
-                    	}else if (tipo.equals(Tipo.REMOVIDO)){//*********************
-                        	try {
-								removido();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-							}
-                        }else if (tipo.equals(Tipo.KICK)){//********************
-                        	control.unloadScreen("Sala:"+mensagem.getSala());
-                        	control.erro("Expulso pelo administrador");
-                        }else if(tipo.equals(Tipo.ATTSALAS)){//************************
-                    		((LayoutController)control.getController("Sala:"+mensagem.getSala())).setSalas(mensagem.getSalasDisponiveis());
-                        }
-                    }
-                });
-
+        		GuiHandler task = new GuiHandler(control,mensagem,this.conexaoHandler);
+        		Thread thread = new Thread(task);
+        		thread.setDaemon(true); // atrlar thread
+        		thread.start();
             }
 			return null;
         }

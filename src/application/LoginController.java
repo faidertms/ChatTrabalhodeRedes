@@ -66,6 +66,7 @@ public class LoginController  implements FactoryController{
 	      }else{
 	    	  controller.loadScreen("Sala:"+mensagem.getSala(),"Layout.fxml");     // posso chamar no login   
 	    	  LayoutController inicial = (LayoutController) controller.getController("Sala:"+mensagem.getSala());
+	    	  controller.setNome(mensagem.getNome());
 	    	  inicial.setConexao(conexaoHandler,mensagem.getNome());
 	    	  controller.setScreen("Sala:"+mensagem.getSala());
 	    	  this.controller.unloadScreen("login");

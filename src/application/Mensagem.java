@@ -105,6 +105,6 @@ public class Mensagem implements Serializable {
     }
     
     public enum Estado {
-    	AUSENTE, OCUPADO, DISPONIVEL
+    	 DISPONIVEL,AUSENTE,OCUPADO
     }
 }

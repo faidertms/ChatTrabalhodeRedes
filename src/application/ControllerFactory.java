@@ -81,6 +81,7 @@ public class ControllerFactory {
 				stage.show();
 				stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				      public void handle(WindowEvent we) {
+				    	  if(!nome.equals("login"))
 				    	  ((LayoutController) control.get(nome)).sairConversa(null);
 				      }
 				  }); 

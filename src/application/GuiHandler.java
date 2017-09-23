@@ -39,9 +39,7 @@ public class GuiHandler extends Task<ObservableList<String>>{
 							}
                         } else if (tipo.equals(Tipo.USUARIOSON) || tipo.equals(Tipo.ALTERARESTADO)) {//******************
                         	((LayoutController)control.getController("Sala:"+mensagem.getSala())).atualizarEstado(mensagem);
-                        	
-                        	
-                            //refreshOnlines(mensagem);
+
                         }else if (tipo.equals(Tipo.TODOS)){
                         		((LayoutController)control.getController("Sala:"+mensagem.getSala())).setText(mensagem.getNome() + " diz: " + mensagem.getTexto() + "\n");
 

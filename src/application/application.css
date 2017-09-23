@@ -177,9 +177,12 @@
     -fx-background-color: #87D37C;
 }
 .Ausente{
-    -fx-background-color: #F4B350;
-}
-.Ocupado{
     -fx-background-color: #D64541;
 }
-
+.Ocupado{
+    -fx-background-color: #F4B350;
+}
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: #207BCF;
+    -fx-text-fill: white;
+}

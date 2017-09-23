@@ -58,7 +58,7 @@ public class LayoutController implements FactoryController, Initializable {
 	private int idSala;
 	private ControllerFactory controller;
 
-	Boolean atualizar;
+	private Boolean atualizar;
 	private ConexaoServidor conexaoHandler;
 	private String nome;
 	private Mensagem mensagem = new Mensagem();
@@ -102,7 +102,12 @@ public class LayoutController implements FactoryController, Initializable {
 						super.updateItem(t, bln);
 						if (t != null) {
 							setText(t);
+							atualizar = true;
 							Estado estado = estados.get(usuariosOnline.indexOf(t));
+							if(nome.equals(t)){
+								System.out.println(estado.name());
+								choiceEstado.getSelectionModel().select(estado.ordinal());
+							}
 							if (estado == Estado.DISPONIVEL) {
 								this.remover();
 								getStyleClass().add("Disponivel");
@@ -119,6 +124,7 @@ public class LayoutController implements FactoryController, Initializable {
 							setText("");
 							this.remover();
 						}
+						atualizar = false;
 					}
 
 					void remover() {
@@ -226,8 +232,10 @@ public class LayoutController implements FactoryController, Initializable {
 		this.mensagem.setTipo(Tipo.DESCONECTARTOTAL);
 		this.conexaoHandler.enviar(mensagem);
 		this.controller.removerTodos();
-		this.controller.loadScreen("login", "Login.fxml");
-		this.controller.setScreen("login");
+		if(event != null){
+			this.controller.loadScreen("login", "Login.fxml");
+			this.controller.setScreen("login");
+		}
 	}
 
 	public void kick(ActionEvent event) {
@@ -278,7 +286,9 @@ public class LayoutController implements FactoryController, Initializable {
 		choiceEstado.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				enviarEstado(arg2.intValue());
+				if(!atualizar){
+					enviarEstado(arg2.intValue());
+				}
 			}
 		});
 
@@ -303,6 +313,7 @@ public class LayoutController implements FactoryController, Initializable {
 		usuariosOnline.addAll(mensagem.getUsuarios()); // mudar pra outra
 		listaUsuario.setItems(usuariosOnline);
 		listaUsuario.refresh();
+		
 	}
 
 	public ObservableList<Estado> getEstados() {

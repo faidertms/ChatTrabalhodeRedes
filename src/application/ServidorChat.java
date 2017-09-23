@@ -25,7 +25,6 @@ public class ServidorChat implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		this.listaDeSala.add(new Sala(0,null)); // sala inicial
-		this.listaDeSala.add(new Sala(1,new Usuario("mike"))); // sala inicial
 		Thread acess = null;
 		System.out.println("Começando");
 		while(true){

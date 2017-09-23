@@ -75,7 +75,7 @@ public class clientHandler implements Runnable {
 		        }else if (tipo.equals(Tipo.KICK)){//****************
 		        	for(Sala sala : usuario.getSalaAtivaUsuario()){
 		        		if(sala.getId() == mensagem.getSala()){
-			        		if(sala.getAdministrador().getNome().get().equals(mensagem.getNome())){ 
+			        		if(sala.getAdministrador() != null && sala.getAdministrador().getNome().get().equals(mensagem.getNome())){ 
 			        			Usuario usuarioTemp = sala.getUsuarioList().get(sala.getUsuarioList().indexOf(new Usuario(mensagem.getNameReserved())));
 			        			usuarioTemp.getSalaAtivaUsuario().remove(sala);
 			        			sala.getUsuarioList().remove(usuario);

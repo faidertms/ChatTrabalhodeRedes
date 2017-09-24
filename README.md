@@ -3,8 +3,8 @@ Chat Trabalho de Redes
 Existe 2 branch (um para a parte servidor e outra para parte Cliente)
 
 Equipe:
-Rodrigo Gomes - 1320661/9
-Thiago Sales  - 1410702/9
+- Rodrigo Gomes - 1320661/9
+- Thiago Sales  - 1410702/9
 
 Linguagem usada: Java
 - Versão do Java deve conter a biblioteca do javaFX

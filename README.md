@@ -1,6 +1,6 @@
-# ChatTrabalhodeRedes
+# Chat Trabalho de Redes
 Chat Trabalho de Redes
-Existe 2 branch (um para a parte servidor e outra para parte Cliente)
+- Existe 2 branch (um para a parte servidor e outra para parte Cliente).
 
 Equipe:
 - Rodrigo Gomes - 1320661/9

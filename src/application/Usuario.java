@@ -3,6 +3,7 @@ package application;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,36 +17,50 @@ public class Usuario {
 	private StringProperty ip;
 	private StringProperty status;
 	private ObjectOutputStream out;
-	Socket socket;
+	private Socket socket;
 	private List<Sala> salaAtivaUsuario;
-	
-	
-	public Usuario(String nome, Socket socket, Estado estado,ObjectOutputStream objectOutputStream) {
+	private PublicKey pubUsuario = null;
+
+	public Usuario(String nome, Socket socket, Estado estado, ObjectOutputStream objectOutputStream,PublicKey pubUsuario ) {
 		super();
 		this.socket = socket;
 		this.nome = new SimpleStringProperty(nome);
-		this.ip =  new SimpleStringProperty(socket.getInetAddress().getHostAddress());
-		this.status =  new SimpleStringProperty(estado.name());
+		this.ip = new SimpleStringProperty(socket.getInetAddress().getHostAddress());
+		this.status = new SimpleStringProperty(estado.name());
 		this.out = objectOutputStream;
 		salaAtivaUsuario = new ArrayList<Sala>();
-		//this.out = out;
+		this.pubUsuario = pubUsuario;
 	}
+
+	public PublicKey getPubUsuario() {
+		return pubUsuario;
+	}
+
+	public void setPubUsuario(PublicKey pubUsuario) {
+		this.pubUsuario = pubUsuario;
+	}
+
 	public ObjectOutputStream getOut() {
 		return out;
 	}
+
 	public void setOut(ObjectOutputStream out) {
 		this.out = out;
 	}
+
 	public Socket getSocket() {
 		return socket;
 	}
+
 	public void setSocket(Socket socket) {
 		this.socket = socket;
 	}
+
 	public Usuario(String nome) { // só para comparação
 		super();
 		this.nome = new SimpleStringProperty(nome);
 	}
+
 	@Override
 	public boolean equals(Object arg0) {
 		return nome.get().equals(((Usuario) arg0).getNome().get());
@@ -54,22 +69,29 @@ public class Usuario {
 	public StringProperty getNome() {
 		return nome;
 	}
+
 	public void setNome(String nome) {
 		this.nome = new SimpleStringProperty(nome);
 	}
+
 	public StringProperty getIp() {
 		return ip;
 	}
+
 	public void setIp(StringProperty ip) {
 		this.ip = ip;
 	}
+
 	public StringProperty getStatus() {
 		return status;
 	}
+
 	public void setStatus(String status) {
-		this.status.set(status);;
+		this.status.set(status);
+		;
 	}
-	public void closeSocket(){
+
+	public void closeSocket() {
 		Mensagem mensagem = new Mensagem();
 		mensagem.setNome(nome.get());
 		mensagem.setTipo(Tipo.REMOVIDO);
@@ -81,11 +103,13 @@ public class Usuario {
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
+
 	public List<Sala> getSalaAtivaUsuario() {
 		return salaAtivaUsuario;
 	}
+
 	public void setSalaAtivaUsuario(List<Sala> salaAtivaUsuario) {
 		this.salaAtivaUsuario = salaAtivaUsuario;
 	}

@@ -13,11 +13,13 @@ public class ServidorChat implements Runnable {
 	private ServerSocket serverSocket;
 	ObservableList<Usuario> usuarioList ; // usuarios totais 
 	private List<Sala> listaDeSala;
+	private Crypto crypt;
 	public ServidorChat(ObservableList<Usuario> usuarioList) throws IOException {
 		super();
 		this.usuarioList = usuarioList;
 		this.listaDeSala = new ArrayList<Sala>();
 		this.serverSocket = new ServerSocket(porta);
+		this.crypt = new Crypto();
 	}
 
 
@@ -32,7 +34,7 @@ public class ServidorChat implements Runnable {
 			try {
 				System.out.println("Esperando uma ação");
 				socket = serverSocket.accept();
-				acess = new Thread(new clientHandler(socket,this.usuarioList,this.listaDeSala));
+				acess = new Thread(new clientHandler(socket,this.usuarioList,this.listaDeSala,this.crypt));
 				acess.start();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

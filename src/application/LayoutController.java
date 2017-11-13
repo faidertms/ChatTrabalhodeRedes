@@ -253,7 +253,6 @@ public class LayoutController implements FactoryController, Initializable {
 
 	public void setConexao(ConexaoServidor conexaoHandler, String nome) throws IOException {
 		this.conexaoHandler = conexaoHandler;
-		conexaoHandler.getSocket();
 		this.nome = nome;
 		ChatHandler task = new ChatHandler(conexaoHandler, controller);
 		Thread thread = new Thread(task);

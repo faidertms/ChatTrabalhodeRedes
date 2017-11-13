@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.security.PublicKey;
 import java.util.ResourceBundle;
 
 import application.Mensagem.Estado;
@@ -57,7 +58,8 @@ public class LoginController  implements FactoryController{
 		//enviar
         conexaoHandler = new ConexaoServidor();
         conexaoHandler.conexao();
-        conexaoHandler.enviar(mensagem);
+        conexaoHandler.trocaChave();
+        conexaoHandler.iniciar(mensagem);
        // in = new ObjectInputStream(socket.getInputStream());
         mensagem = conexaoHandler.receber();//(Mensagem) in.readObject();
 		 if (mensagem.getTexto().equals("RECUSADA")) {

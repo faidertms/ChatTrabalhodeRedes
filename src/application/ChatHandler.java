@@ -22,11 +22,11 @@ public class ChatHandler extends Task<ObservableList<String>>{
 	private Mensagem mensagem;
 	private ConexaoServidor conexaoHandler;
 	private ControllerFactory control;
-	private ObjectInputStream input;
+	//private ObjectInputStream input;
 	
 	public ObservableList<String> call() throws Exception {
         mensagem = null;
-            while ((mensagem = (Mensagem) input.readObject()) != null) {
+            while ((mensagem = this.conexaoHandler.receber()) != null) {
             	System.out.println(mensagem.getTipo());
             	System.out.println("recebi");
         		GuiHandler task = new GuiHandler(control,mensagem,this.conexaoHandler);
@@ -41,7 +41,7 @@ public class ChatHandler extends Task<ObservableList<String>>{
 		super();
 		//this.textoChat = textoChat;
 		this.conexaoHandler = conexaoHandler;
-		input = conexaoHandler.getInput();
+		//input = conexaoHandler.getInput();
 		this.control = control;
 
 	}

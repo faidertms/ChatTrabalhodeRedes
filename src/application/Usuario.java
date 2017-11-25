@@ -7,6 +7,8 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.crypto.SecretKey;
+
 import application.Mensagem.Estado;
 import application.Mensagem.Tipo;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,8 +22,9 @@ public class Usuario {
 	private Socket socket;
 	private List<Sala> salaAtivaUsuario;
 	private PublicKey pubUsuario = null;
+	private SecretKey chaveDES = null;
 
-	public Usuario(String nome, Socket socket, Estado estado, ObjectOutputStream objectOutputStream,PublicKey pubUsuario ) {
+	public Usuario(String nome, Socket socket, Estado estado, ObjectOutputStream objectOutputStream,PublicKey pubUsuario,SecretKey chaveDES ) {
 		super();
 		this.socket = socket;
 		this.nome = new SimpleStringProperty(nome);
@@ -30,6 +33,7 @@ public class Usuario {
 		this.out = objectOutputStream;
 		salaAtivaUsuario = new ArrayList<Sala>();
 		this.pubUsuario = pubUsuario;
+		this.chaveDES = chaveDES;
 	}
 
 	public PublicKey getPubUsuario() {
@@ -112,5 +116,13 @@ public class Usuario {
 
 	public void setSalaAtivaUsuario(List<Sala> salaAtivaUsuario) {
 		this.salaAtivaUsuario = salaAtivaUsuario;
+	}
+
+	public SecretKey getChaveDES() {
+		return chaveDES;
+	}
+
+	public void setChaveDES(SecretKey chaveDES) {
+		this.chaveDES = chaveDES;
 	}
 }

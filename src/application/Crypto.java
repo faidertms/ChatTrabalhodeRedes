@@ -27,6 +27,7 @@ public class Crypto {
 
 	private PrivateKey priv = null;
 	private PublicKey pub = null;
+	private SecretKey chaveDES = null;
 
 	Crypto() {
 		gerarChaves();
@@ -53,30 +54,47 @@ public class Crypto {
 	public void gerarChaves() {
 		try {
 			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+			KeyGenerator keygenerator = KeyGenerator.getInstance("DES");
 			kpg.initialize(new RSAKeyGenParameterSpec(RSAKEYSIZE, RSAKeyGenParameterSpec.F4));
 			KeyPair kpr = kpg.generateKeyPair();
 			priv = kpr.getPrivate();
 			pub = kpr.getPublic();
+			setChaveDES(keygenerator.generateKey());
 		} catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 
 	}
+	public SecretKey DescryptChave(CryptoMensagem mensagem){
+		try {
+			Cipher rsaCipher = Cipher.getInstance("RSA");
+			rsaCipher.init(Cipher.DECRYPT_MODE, this.priv);
+			byte chaveDES2[]= rsaCipher.doFinal(mensagem.getKeyCrypto());
+			SecretKey chavDES = new SecretKeySpec(chaveDES2, 0, chaveDES2.length, "DES");
+			return chavDES;
+			
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 
-	CryptoMensagem cryptMensagem(Mensagem mensagem, PublicKey servidor) {
+	}
+
+	CryptoMensagem cryptMensagem(Mensagem mensagem, SecretKey chaveDES) {
 		CryptoMensagem crypt = new CryptoMensagem();
 		KeyGenerator keygenerator = null;
 		try {
-			keygenerator = KeyGenerator.getInstance("DES");
-			SecretKey chaveDES = keygenerator.generateKey();
+			//keygenerator = KeyGenerator.getInstance("DES");
+			//SecretKey chaveDES = keygenerator.generateKey();
 			Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
 			desCipher.init(Cipher.ENCRYPT_MODE, chaveDES);
 			crypt.setMensagem(desCipher.doFinal(mensagemBytes(mensagem)));
 
-			Cipher rsaCipher = Cipher.getInstance("RSA");
+			/*Cipher rsaCipher = Cipher.getInstance("RSA");
 			rsaCipher.init(Cipher.ENCRYPT_MODE, servidor);
-			crypt.setKeyCrypto(rsaCipher.doFinal(chaveDES.getEncoded()));
+			crypt.setKeyCrypto(rsaCipher.doFinal(chaveDES.getEncoded()));*/
 			return crypt;
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException
 				| BadPaddingException | IOException e) {
@@ -86,13 +104,13 @@ public class Crypto {
 		return null;
 	}
 
-	Mensagem DescryptMensagem(CryptoMensagem mensagem) {
+	Mensagem DescryptMensagem(CryptoMensagem mensagem, SecretKey chaveDES) {
 
 		try {
-			Cipher rsaCipher = Cipher.getInstance("RSA");
+			/*Cipher rsaCipher = Cipher.getInstance("RSA");
 			rsaCipher.init(Cipher.DECRYPT_MODE, this.priv);
 			byte chaveDES2[]= rsaCipher.doFinal(mensagem.getKeyCrypto());
-			SecretKey chaveDES = new SecretKeySpec(chaveDES2, 0, chaveDES2.length, "DES");
+			SecretKey chaveDES = new SecretKeySpec(chaveDES2, 0, chaveDES2.length, "DES");*/
 			Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
 			desCipher.init(Cipher.DECRYPT_MODE, chaveDES);
 			return (Mensagem) this.byteObject(desCipher.doFinal(mensagem.getMensagem()));
@@ -123,5 +141,13 @@ public class Crypto {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public SecretKey getChaveDES() {
+		return chaveDES;
+	}
+
+	public void setChaveDES(SecretKey chaveDES) {
+		this.chaveDES = chaveDES;
 	}
 }

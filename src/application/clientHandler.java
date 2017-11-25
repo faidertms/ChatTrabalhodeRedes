@@ -6,6 +6,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.SecretKey;
+
 import application.Mensagem.Estado;
 import application.Mensagem.Tipo;
 import javafx.collections.ObservableList;
@@ -27,6 +30,7 @@ public class clientHandler implements Runnable {
     private Usuario usuario;
     boolean isConnect;
     private Crypto crypt;
+    private SecretKey chaveDES = null;
     
 	@Override
 	public void run() {
@@ -36,13 +40,16 @@ public class clientHandler implements Runnable {
 		this.enviarPub(this.out);
 		try {	
 			while ((cryptomensagem = (CryptoMensagem) in.readObject()) != null) { 
-				mensagem = crypt.DescryptMensagem(cryptomensagem);
+				if(!isConnect){
+					this.chaveDES = this.crypt.DescryptChave(cryptomensagem);
+				}
+				mensagem = crypt.DescryptMensagem(cryptomensagem,this.chaveDES);
 				System.out.println(mensagem.getTipo());
 				System.out.println(mensagem.getNome());
 				Tipo tipo = mensagem.getTipo();
 				
 				if (tipo.equals(Tipo.ABRIRCONEXAO)) { //*********
-					usuario = new Usuario(mensagem.getNome(),socket,Estado.DISPONIVEL,out,cryptomensagem.getPub());
+					usuario = new Usuario(mensagem.getNome(),socket,Estado.DISPONIVEL,out,cryptomensagem.getPub(),this.chaveDES);
 		            isConnect = conectar(mensagem);
 		            if (isConnect) {
 		            	this.usuarioList.add(usuario);   
@@ -172,7 +179,7 @@ public class clientHandler implements Runnable {
 	        
         private void enviarMensagem(Mensagem mensagem, Usuario usuario) {
             try {
-                usuario.getOut().writeObject(this.crypt.cryptMensagem(mensagem, usuario.getPubUsuario())); // add
+                usuario.getOut().writeObject(this.crypt.cryptMensagem(mensagem, usuario.getChaveDES())); // add
                 usuario.getOut().flush();
             } catch (IOException e) {
             	e.printStackTrace();

@@ -36,8 +36,8 @@ public class ConexaoServidor {
 	}
 
 	public void iniciar(Mensagem mensagem) {
-		CryptoMensagem crypt = this.crypt.cryptMensagem(mensagem, pubServidor);
-		crypt.setPub(this.crypt.getPub());
+		CryptoMensagem crypt = this.crypt.cryptMensagem(mensagem, pubServidor);// recebe a chave publica do servidor
+		crypt.setPub(this.crypt.getPub());//manda a chave pública do cliente
 		try {
 			output.writeObject(crypt);
 		} catch (IOException ex) {

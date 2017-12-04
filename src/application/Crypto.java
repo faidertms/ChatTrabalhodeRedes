@@ -88,7 +88,7 @@ public class Crypto {
 		try {
 			//keygenerator = KeyGenerator.getInstance("DES");
 			//SecretKey chaveDES = keygenerator.generateKey();
-			Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+			Cipher desCipher = Cipher.getInstance("DES");
 			desCipher.init(Cipher.ENCRYPT_MODE, chaveDES);
 			crypt.setMensagem(desCipher.doFinal(mensagemBytes(mensagem)));
 
@@ -111,7 +111,7 @@ public class Crypto {
 			rsaCipher.init(Cipher.DECRYPT_MODE, this.priv);
 			byte chaveDES2[]= rsaCipher.doFinal(mensagem.getKeyCrypto());
 			SecretKey chaveDES = new SecretKeySpec(chaveDES2, 0, chaveDES2.length, "DES");*/
-			Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+			Cipher desCipher = Cipher.getInstance("DES");
 			desCipher.init(Cipher.DECRYPT_MODE, chaveDES);
 			return (Mensagem) this.byteObject(desCipher.doFinal(mensagem.getMensagem()));
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException

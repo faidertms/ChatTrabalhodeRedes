@@ -24,6 +24,7 @@ Execução do programa
 - No servidor caso deseje remover uma pessoa, basta selecionar e apertar em remover.
 
 Funcionalidades Implementadas
+- CRIPTOGRAFIA RSA/DES
 - Interface gráfica para aplicação cliente e poder enviar mensagem privada.
 - Interface gráfica para aplicação servidor mostrando todos os usuários com suas informações, podendo remover do servidor.
 - Usuário pode criar uma nova sala de bate papo publica no qual ele é o administrador podendo dar um kick em qualquer usuário presente nessa sala.

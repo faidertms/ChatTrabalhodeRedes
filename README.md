@@ -1,7 +1,9 @@
 # Chat Trabalho de Redes
 Chat Trabalho de Redes
 - Existe 2 branch (um para a parte servidor e outra para parte Cliente).
-
+- Client side: https://github.com/faidertms/ChatTrabalhodeRedes/tree/ClienteSide  
+- Server side: https://github.com/faidertms/ChatTrabalhodeRedes/tree/ServerSide  
+ 
 Equipe:
 - Rodrigo Gomes - 1320661/9
 - Thiago Sales  - 1410702/9
